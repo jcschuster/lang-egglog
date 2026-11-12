@@ -1,0 +1,39 @@
+# Integers are what Rust's i64 parses
+
+(f 0 -1 +1 007 9223372036854775807 -9223372036854775808)
+
+==>
+
+Program(List("(",Callee,Integer,Integer,Integer,Integer,Integer,Integer,")"))
+
+# An integer outside i64 is a float
+
+(f 9223372036854775808 -9223372036854775809)
+
+==>
+
+Program(List("(",Callee,Float,Float,")"))
+
+# Floats are what Rust's f64 parses, if finite
+
+(f 1.5 1. .5 -.5 +.5 5e3 5E+3 5e-3 1.e1)
+
+==>
+
+Program(List("(",Callee,Float,Float,Float,Float,Float,Float,Float,Float,Float,")"))
+
+# NaN, inf and -inf are the only non-finite floats
+
+(f NaN inf -inf nan +inf Infinity 1e999)
+
+==>
+
+Program(List("(",Callee,Float,Float,Float,Atom,Atom,Atom,Atom,")"))
+
+# Near misses are atoms
+
+(f - + . 5e .e1 1_000 0x10 1f 12abc)
+
+==>
+
+Program(List("(",Callee,Atom,Atom,Atom,Atom,Atom,Atom,Atom,Atom,Atom,")"))

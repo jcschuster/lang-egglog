@@ -1,0 +1,55 @@
+# Command, action and schedule keywords in head position
+
+(run-schedule (saturate (seq (run r :until (= x 1)) (repeat 2 r))))
+(let x 1)
+(rule ((= x (f y))) ((set (g x) 1) (union x y)))
+
+==>
+
+Program(
+  List("(",CommandKeyword,List("(",ScheduleKeyword,List("(",ScheduleKeyword,List("(",ScheduleKeyword,Atom,Option,List("(",Callee,Atom,Integer,")"),")"),List("(",ScheduleKeyword,Integer,Atom,")"),")"),")"),")"),
+  List("(",ActionKeyword,Atom,Integer,")"),
+  List("(",CommandKeyword,List("(",List("(",Callee,Atom,List("(",Callee,Atom,")"),")"),")"),List("(",List("(",ActionKeyword,List("(",Callee,Atom,")"),Integer,")"),List("(",ActionKeyword,Atom,Atom,")"),")"),")"))
+
+# run is a command at top level and a schedule nested
+
+(run 10)
+(run-schedule (run))
+
+==>
+
+Program(List("(",CommandKeyword,Integer,")"),List("(",CommandKeyword,List("(",ScheduleKeyword,")"),")"))
+
+# A command nested in fail
+
+(fail (check (= 1 2)))
+
+==>
+
+Program(List("(",CommandKeyword,List("(",CommandKeyword,List("(",Callee,Integer,Integer,")"),")"),")"))
+
+# Keywords outside head position are atoms
+
+(let rule 1)
+(f run let saturate)
+
+==>
+
+Program(List("(",ActionKeyword,Atom,Integer,")"),List("(",Callee,Atom,Atom,Atom,")"))
+
+# Schedule keywords at top level and unknown heads are callees
+
+(saturate r)
+(my-command 1 (my-macro x))
+
+==>
+
+Program(List("(",Callee,Atom,")"),List("(",Callee,Integer,List("(",Callee,Atom,")"),")"))
+
+# A list need not start with an atom
+
+(rule ((f x)) ((1 2)))
+
+==>
+
+Program(List("(",CommandKeyword,List("(",List("(",Callee,Atom,")"),")"),List("(",List("(",Integer,Integer,")"),")"),")"))
