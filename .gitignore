@@ -3,3 +3,4 @@ dist/
 .direnv/
 .pnpm-store/
 .claude/
+corpus/

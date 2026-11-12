@@ -1,0 +1,73 @@
+# Line comment
+
+; a comment (with parens) "and quotes"
+(push) ; trailing
+
+==>
+
+Program(LineComment,List("(",CommandKeyword,")"),LineComment)
+
+# Strings and their four escapes
+
+(print-function "a\n\t\\\"b" "")
+
+==>
+
+Program(List("(",CommandKeyword,String,String,")"))
+
+# Any other escape is an error
+
+(include "a\qb")
+
+==>
+
+Program(List("(",CommandKeyword,⚠,Atom,")"))
+
+# A string ends an atom, a quote inside an atom does not
+
+(f "a"b a"b" c")
+
+==>
+
+Program(List("(",Callee,String,Atom,Atom,Atom,")"))
+
+# Unit, wildcard, booleans
+
+(f () _ true false _x truex)
+
+==>
+
+Program(List("(",Callee,Unit("(",")"),Wildcard,Bool,Bool,Atom,Atom,")"))
+
+# Options are atoms starting with a colon
+
+(function f () i64 :merge (max old new) :no-merge :)
+
+==>
+
+Program(List("(",CommandKeyword,Atom,Unit("(",")"),Atom,Option,List("(",Callee,Atom,Atom,")"),Option,Option,")"))
+
+# An atom runs to whitespace, semicolon or a paren
+
+(a;b
+c(d)e)
+
+==>
+
+Program(List("(",Callee,LineComment,Atom,List("(",Callee,")"),Atom,")"))
+
+# Rust whitespace beyond ASCII separates atoms; a byte order mark does not
+
+(a b c　d﻿e)
+
+==>
+
+Program(List("(",Callee,Atom,Atom,Atom,")"))
+
+# The top level holds only lists headed by an atom
+
+x (f) ()
+
+==>
+
+Program(⚠,List("(",Callee,")"),List("(",Callee(⚠),")"))

@@ -1,0 +1,24 @@
+; Datalog: transitive closure over a small graph.
+(relation edge (i64 i64))
+(relation path (i64 i64))
+
+(edge 1 2)
+(edge 2 3)
+(edge 3 4)
+
+(rule ((edge x y)) ((path x y)))
+(rule ((path x y) (edge y z)) ((path x z)))
+
+(run 10)
+
+(check (path 1 4))
+(fail (check (path 4 1)))
+
+(function weight (i64 i64) f64 :no-merge)
+(set (weight 1 2) 2.5e-1)
+(set (weight 2 3) -1.)
+(sort Edges (Vec i64))
+(let $empty (vec-empty))
+(sort Node)
+(constructor Pair (i64 bool) Node)
+(Pair 1 true)

@@ -1,15 +1,15 @@
 {
-  "name": "codemirror-lang-tptp",
-  "version": "0.1.1",
+  "name": "codemirror-lang-egglog",
+  "version": "0.1.0",
   "keywords": [
     "codemirror",
     "lezer",
-    "tptp",
-    "theorem-proving"
+    "egglog",
+    "e-graphs"
   ],
-  "description": "TPTP language support for CodeMirror",
+  "description": "egglog language support for CodeMirror",
   "scripts": {
-    "test": "mocha test/test.js test/fixtures.js",
+    "test": "mocha test/test.js test/fixtures.js test/editor.js test/keywords.js",
     "build": "rollup -c && tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist",
     "prepare": "pnpm run build"
   },
@@ -23,15 +23,17 @@
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "dependencies": {
+    "@codemirror/autocomplete": "^6.0.0",
     "@codemirror/language": "^6.0.0",
     "@lezer/common": "^1.5.3",
     "@lezer/highlight": "^1.0.0",
     "@lezer/lr": "^1.0.0"
   },
   "devDependencies": {
+    "@codemirror/state": "^6.0.0",
     "@lezer/generator": "^1.0.0",
     "@rollup/plugin-typescript": "^12.1.4",
-    "@types/node": "^24.1.0",
+    "@types/node": "^26.0.0",
     "mocha": "^11.7.1",
     "rollup": "^4.45.1",
     "tslib": "^2.8.1",
@@ -39,11 +41,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jcschuster/lang-tptp.git",
-    "directory": "packages/codemirror-lang-tptp"
+    "url": "git+https://github.com/jcschuster/lang-egglog.git",
+    "directory": "packages/codemirror-lang-egglog"
   },
   "license": "MIT",
-  "tptp": {
-    "bnf": "9.3.1.6"
+  "egglog": {
+    "version": "3.0.0"
   }
 }

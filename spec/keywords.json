@@ -1,0 +1,73 @@
+{
+  "commands": [
+    "birewrite",
+    "check",
+    "constructor",
+    "datatype",
+    "datatype*",
+    "extract",
+    "fail",
+    "function",
+    "include",
+    "input",
+    "output",
+    "pop",
+    "print-function",
+    "print-size",
+    "print-stats",
+    "prove",
+    "prove-exists",
+    "push",
+    "relation",
+    "rewrite",
+    "rule",
+    "ruleset",
+    "run",
+    "run-schedule",
+    "sort",
+    "unstable-combined-ruleset"
+  ],
+  "actions": [
+    "delete",
+    "let",
+    "panic",
+    "set",
+    "subsume",
+    "union"
+  ],
+  "schedules": [
+    "repeat",
+    "run",
+    "saturate",
+    "seq"
+  ],
+  "facts": [
+    "="
+  ],
+  "options": [
+    ":cost",
+    ":file",
+    ":merge",
+    ":mode",
+    ":naive",
+    ":name",
+    ":no-decomp",
+    ":no-merge",
+    ":ruleset",
+    ":subsume",
+    ":unextractable",
+    ":unsafe-seminaive",
+    ":until",
+    ":when"
+  ],
+  "internalOptions": [
+    ":internal-container-rebuild",
+    ":internal-hidden",
+    ":internal-include-subsumed",
+    ":internal-let",
+    ":internal-proof-func",
+    ":internal-proof-names",
+    ":internal-term-constructor",
+    ":internal-uf"
+  ]
+}

@@ -1,0 +1,35 @@
+; Arithmetic rewriting with a cost model, a ruleset and a schedule.
+(datatype Math
+  (Num i64)
+  (Var String)
+  (Add Math Math)
+  (Mul Math Math :cost 2))
+
+(ruleset algebra)
+
+(rewrite (Add a b) (Add b a) :ruleset algebra)
+(rewrite (Mul a (Num 1)) a :ruleset algebra)
+(birewrite (Mul a (Add b c)) (Add (Mul a b) (Mul a c)) :ruleset algebra)
+(rewrite (Add (Num a) (Num b)) (Num (+ a b)) :when ((< a 1000)))
+
+(function depth (Math) i64 :merge (max old new))
+
+(rule ((= e (Num n)))
+      ((set (depth e) 0))
+      :name "leaf depth")
+
+(let $expr (Add (Var "x") (Mul (Num 2) (Num 1))))
+
+(run-schedule
+  (repeat 3
+    (seq (saturate (run algebra))
+         (run :until (= $expr (Num 0))))))
+
+(check (= $expr (Add (Var "x") (Num 2))))
+(extract $expr)
+(push)
+(union $expr (Num -1))
+(fail (check (= (Num 1) (Num 2))))
+(pop)
+(print-function depth 10)
+(print-size)

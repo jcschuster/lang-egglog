@@ -1,19 +1,30 @@
-lang-tptp is licensed under the MIT licence in LICENSE. Its grammars are derived from
-material of the TPTP World, which that licence does not cover.
+lang-egglog is licensed under the MIT licence in LICENSE.
 
-    The TPTP is copyrighted 1993-onwards, by Geoff Sutcliffe & Christian Suttner.
-    Verbatim redistribution of the TPTP and parts of the TPTP is permitted provided
-    that the redistribution is clearly attributed to the TPTP. Distribution of any
-    modified version or modified part of the TPTP requires permission.
+The keyword tables (spec/keywords.json, and the keyword rules of egglog.grammar and
+keywords.ts that are generated from it) are derived from egglog's parser source,
+src/ast/parse.rs of https://github.com/egraphs-good/egglog, at the release recorded in
+spec/SOURCE and in the package's package.json under "egglog": {"version": ...}. The lexical
+rules of egglog.grammar and tokens.ts are written to match that parser. egglog is
+licensed as follows:
 
-        -- https://tptp.org/cgi-bin/SeeTPTP?Category=Documents&File=ReadMe
+    MIT License
 
-The tree-sitter grammar (grammar.js and the parser generated from it), the Lezer
-grammar (tptp.grammar and the parser generated from it), the Monarch tokenizer
-(monarch.ts) and the highlighting rules are generated from the TPTP syntax BNF,
-https://github.com/TPTPWorld/SyntaxBNF, by `mix lang_tptp.gen`
-(https://github.com/jcschuster/lang-tptp). The BNF is read from the copy that the
-`tptp` Hex package vendors; each package records the BNF version it was generated
-from under "tptp": {"bnf": ...} in its package.json.
+    Copyright (c) 2025 egraphs-good
 
-TPTP World is the work of Geoff Sutcliffe. See https://tptp.org.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.

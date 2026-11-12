@@ -1,0 +1,117 @@
+name: egglog
+
+# Looks each night for a stable egglog release on crates.io newer than the pinned one
+# (egglog's GitHub repository has tags but no GitHub releases), and opens a pull request
+# that moves the pin to it (package.json, flake.nix, flake.lock), regenerates the keyword
+# tables, and lists the keywords added and removed. It releases nothing: to release, bump
+# the version and label it as release.yml says.
+#
+# A removed keyword fails `pnpm generate` once (see gen/keywords.mjs), so the pull request
+# is then opened as a draft. Hand-written code names no keyword, but test/heads.txt does,
+# and fails when one it names disappears.
+#
+# A pull request opened with GITHUB_TOKEN does not start other workflows, so ci would not
+# run on it. Set an EGGLOG_PR_TOKEN secret (a fine-grained token with contents and
+# pull-request write access) to have it run; without one, the pull request is still opened
+# and the tests below are its only check.
+
+on:
+  schedule:
+    - cron: "0 5 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: egglog
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.EGGLOG_PR_TOKEN || secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.EGGLOG_PR_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Move to the newest egglog, if it is another
+        id: bump
+        run: nix develop --command .github/scripts/egglog-bump.sh "$RUNNER_TEMP/keywords.txt"
+
+      # One pull request per release: once its branch exists, later nights leave it to the
+      # review.
+      - name: Skip a release already proposed
+        id: fresh
+        if: steps.bump.outputs.version != ''
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --heads origin "egglog-v$VERSION"; then
+            echo "branch egglog-v$VERSION exists; nothing to do"
+            echo "open=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "open=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A fresh devshell, so that it builds the newly pinned egglog.
+      - name: Test the regenerated package
+        id: test
+        if: steps.fresh.outputs.open == 'true'
+        run: |
+          set +e
+          nix develop --command .github/scripts/test-all.sh 2>&1 | tee "$RUNNER_TEMP/test.log"
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Open the pull request
+        if: steps.fresh.outputs.open == 'true'
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+          OLD: ${{ steps.bump.outputs.old }}
+          GENERATED: ${{ steps.bump.outputs.generated }}
+          TEST_STATUS: ${{ steps.test.outputs.status }}
+        run: |
+          branch="egglog-v$VERSION"
+          title="egglog $VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -A
+          git commit -m "$title"
+          git push origin "$branch"
+
+          if [ "$GENERATED" = ok ] && [ "$TEST_STATUS" = 0 ]; then
+            verdict="Generation and every test pass."
+            draft=()
+          else
+            verdict="Something fails, so this is opened as a draft: fix it on this branch before merging."
+            draft=(--draft)
+          fi
+
+          {
+            echo "egglog $VERSION is on crates.io. This moves the pin to it from $OLD ([changes](https://github.com/egraphs-good/egglog/compare/v$OLD...v$VERSION)) and regenerates the keyword tables."
+            echo
+            echo "$verdict"
+            echo
+            echo '```text'
+            grep -E '^(PASS|FAIL) ' "$RUNNER_TEMP/test.log" || tail -n 5 "$RUNNER_TEMP/test.log"
+            echo '```'
+            echo
+            echo "## Keywords"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/keywords.txt"
+            echo '```'
+            echo
+            echo "No lines above but the commands run means no keyword changed. test/keywords.js checks every listed keyword in head position."
+          } > "$RUNNER_TEMP/body.md"
+
+          gh label create dependencies --color 0366d6 \
+            --description "Moves a dependency" 2>/dev/null || true
+          gh pr create "${draft[@]}" --base main --head "$branch" --label dependencies \
+            --title "$title" --body-file "$RUNNER_TEMP/body.md"
