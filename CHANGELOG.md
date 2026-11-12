@@ -10,6 +10,8 @@ The egglog release the keyword tables were read from is recorded in `package.jso
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-12
+
 ### Added
 
 - `codemirror-lang-egglog`: a CodeMirror 6 language (Lezer parser) for egglog with
